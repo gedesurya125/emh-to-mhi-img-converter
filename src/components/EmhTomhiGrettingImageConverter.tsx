@@ -16,30 +16,26 @@ export const EmhToMhiGreetingImageConverter = () => {
 
   const [output, setOutput] = useState("");
   React.useEffect(() => {
-    if (input) {
-      const imageUrls: string[] = [];
-      previewRef.current?.querySelectorAll("img").forEach((img) => {
-        imageUrls.push(img.src);
-      });
+    const imageUrls: string[] = [];
+    previewRef.current?.querySelectorAll("img").forEach((img) => {
+      imageUrls.push(img.src);
+    });
 
-      const hostUrl = process.env.NEXT_PUBLIC_HOST_URL
-        ? `https://${process.env.NEXT_PUBLIC_HOST_URL}`
-        : `http://localhost:3000`;
+    const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || `http://localhost:3000`;
 
-      const emhBaseUrl = "https://en.minghui.org";
-      const convertedImageUrlToMHI = imageUrls.map((imageUrl) =>
-        imageUrl.replace(hostUrl, emhBaseUrl)
-      );
+    const emhBaseUrl = "https://en.minghui.org";
+    const convertedImageUrlToMHI = imageUrls.map((imageUrl) =>
+      imageUrl.replace(hostUrl, emhBaseUrl)
+    );
 
-      setOutput(
-        convertedImageUrlToMHI
-          .map(
-            (emhImageUrl) =>
-              `<p style="text-align: center"><img src="${emhImageUrl}" style="width: 500px" /></p>`
-          )
-          .join("\n")
-      );
-    }
+    setOutput(
+      convertedImageUrlToMHI
+        .map(
+          (emhImageUrl) =>
+            `<p style="text-align: center"><img src="${emhImageUrl}" style="width: 500px" /></p>`
+        )
+        .join("\n")
+    );
   }, [input]);
 
   const handleCopyToClipboard = async (e: React.MouseEvent) => {
