@@ -22,8 +22,8 @@ export const EmhToMhiGreetingImageConverter = () => {
         imageUrls.push(img.src);
       });
 
-      const hostUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      const hostUrl = process.env.NEXT_PUBLIC_HOST_URL
+        ? `https://${process.env.NEXT_PUBLIC_HOST_URL}`
         : `http://localhost:3000`;
 
       const emhBaseUrl = "https://en.minghui.org";
