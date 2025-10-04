@@ -1,8 +1,16 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+
+const staticText = {
+  copyToClipBoard: "Copy to Clipboard",
+  copied: "Copied",
+};
 
 export const EmhToMhiGreetingImageConverter = () => {
-  const [input, setInput] = useState("hello");
+  const [input, setInput] = useState("");
+  const [buttonText, setButtonText] = useState(staticText.copyToClipBoard);
+
+  const timeoutRef = useRef<any>(null);
 
   const previewRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -34,6 +42,24 @@ export const EmhToMhiGreetingImageConverter = () => {
     }
   }, [input]);
 
+  const handleCopyToClipboard = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(output);
+      setButtonText(staticText.copied);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        setButtonText(staticText.copyToClipBoard);
+      }, 1000);
+    } catch (err) {
+      alert("Failed to copy text."); // Optional: provide user feedback
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <div className="border p-20">
@@ -58,9 +84,18 @@ export const EmhToMhiGreetingImageConverter = () => {
           dangerouslySetInnerHTML={{ __html: input }}
         />
         <fieldset className="flex flex-col mt-10">
-          <label htmlFor="code-input" className="mb-2 font-bold">
-            Output:
-          </label>
+          <div className="flex justify-between">
+            <label htmlFor="code-input" className="mb-2 font-bold">
+              Output:
+            </label>
+            <button
+              className="bg-white text-black px-4 py-1 rounded-t-md cursor-pointer relative flex items-center justify-center"
+              onClick={handleCopyToClipboard}
+            >
+              <span className="opacity-0">{staticText.copyToClipBoard}</span>
+              <span className="absolute">{buttonText}</span>
+            </button>
+          </div>
           <textarea
             id="code-input"
             className="border"
