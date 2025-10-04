@@ -23,6 +23,11 @@ export const EmhToMhiGreetingImageConverter = () => {
 
     const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || `http://localhost:3000`;
 
+    console.log("this is the host Url", {
+      env: process.env.NEXT_PUBLIC_HOST_URL,
+      vercel: process.env.NEXT_PUBLIC_VERCEL_URL,
+    });
+
     const emhBaseUrl = "https://en.minghui.org";
     const convertedImageUrlToMHI = imageUrls.map((imageUrl) =>
       imageUrl.replace(hostUrl, emhBaseUrl)
