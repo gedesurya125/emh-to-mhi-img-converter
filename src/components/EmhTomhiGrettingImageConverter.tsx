@@ -61,13 +61,33 @@ export const EmhToMhiGreetingImageConverter = () => {
     }
   };
 
+  const handlePasteFromClipboard = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const clipText = await navigator.clipboard.readText();
+
+      setInput(clipText);
+    } catch (err) {
+      alert("Clipboard is empty");
+    }
+  };
+
   return (
     <div className="container mx-auto">
       <div className="border p-20">
         <fieldset className="flex flex-col">
-          <label htmlFor="code-input" className="mb-2 font-bold">
-            Input:
-          </label>
+          <div className="flex justify-between">
+            <label htmlFor="code-input" className="mb-2 font-bold">
+              Input:
+            </label>
+            <button
+              className="bg-white text-black px-4 py-1 rounded-t-md cursor-pointer relative flex items-center justify-center"
+              onClick={handlePasteFromClipboard}
+            >
+              Paste from Clipboard
+            </button>
+          </div>
           <textarea
             id="code-input"
             className="border"
