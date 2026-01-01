@@ -6,6 +6,9 @@ const staticText = {
   copied: "Copied",
 };
 
+const emhBaseUrl = "https://en.minghui.org";
+const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || `http://localhost:3000`;
+
 export const EmhToMhiGreetingImageConverter = () => {
   const [input, setInput] = useState("");
   const [buttonText, setButtonText] = useState(staticText.copyToClipBoard);
@@ -16,31 +19,56 @@ export const EmhToMhiGreetingImageConverter = () => {
 
   const [output, setOutput] = useState("");
   React.useEffect(() => {
-    const imageUrls: string[] = [];
-    previewRef.current?.querySelectorAll("img").forEach((img) => {
-      imageUrls.push(img.src);
+    const imageAndVideo: (
+      | { type: "IMG"; url: string }
+      | { type: "VIDEO"; url: string; videoType?: string }
+    )[] = [];
+    const imageOrVideoElements =
+      previewRef.current?.querySelectorAll("img, video");
+
+    imageOrVideoElements?.forEach((element: any) => {
+      const tagName = element.tagName;
+
+      if (tagName === "IMG") {
+        const imageElement = element as HTMLImageElement;
+        imageAndVideo.push({
+          type: "IMG",
+          url: imageElement.src,
+        });
+      }
+      if (tagName === "VIDEO") {
+        const videoElement = element as HTMLVideoElement;
+        const videoSourceElement = videoElement.querySelector("source");
+        const videoUrl = videoElement?.src || videoSourceElement?.src;
+        const videoType = videoSourceElement?.type;
+        if (videoUrl) {
+          imageAndVideo.push({
+            type: "VIDEO",
+            url: videoUrl,
+            videoType: videoType,
+          });
+        } else {
+          alert("The url of the video is not found");
+        }
+      }
     });
 
-    const hostUrl = process.env.NEXT_PUBLIC_HOST_URL || `http://localhost:3000`;
+    const output = imageAndVideo
+      .map((item) => {
+        const url = item.url.replace(hostUrl, emhBaseUrl);
 
-    console.log("this is the host Url", {
-      env: process.env.NEXT_PUBLIC_HOST_URL,
-      vercel: process.env.NEXT_PUBLIC_VERCEL_URL,
-    });
+        if (item.type === "IMG") {
+          return `<p style="text-align: center"><img src="${url}" style="width: 500px" /></p>`;
+        }
+        if (item.type === "VIDEO") {
+          return `<p style="text-align: center"><video controls="" style="width:500px"><source src="${url}" type="${
+            item.videoType || "video/mp4"
+          }"></video></p>`;
+        }
+      })
+      .join("\n");
 
-    const emhBaseUrl = "https://en.minghui.org";
-    const convertedImageUrlToMHI = imageUrls.map((imageUrl) =>
-      imageUrl.replace(hostUrl, emhBaseUrl)
-    );
-
-    setOutput(
-      convertedImageUrlToMHI
-        .map(
-          (emhImageUrl) =>
-            `<p style="text-align: center"><img src="${emhImageUrl}" style="width: 500px" /></p>`
-        )
-        .join("\n")
-    );
+    setOutput(output);
   }, [input]);
 
   const handleCopyToClipboard = async (e: React.MouseEvent) => {
